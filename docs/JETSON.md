@@ -45,7 +45,7 @@ program of the account).
 ### 2. Our checkout
 
 ```bash
-git clone https://github.com/PawPrintStudio/ur7e-language-pick-and-place.git ~/chess_arm
+git clone https://github.com/PawPrintStudio/chess_arm.git ~/chess_arm
 cd ~/chess_arm
 ```
 
@@ -83,12 +83,14 @@ numpy, OpenCV and PyYAML stay the system ones: never pip-install them here.
 ```bash
 source /opt/ros/humble/setup.bash
 bash scripts/vendor_import.sh
-colcon build --symlink-install --packages-skip ur7e_gazebo --parallel-workers 2
+colcon build --symlink-install --parallel-workers 2
 ```
 
-`vendor_import.sh` fetches the UR + RG2 drivers and pymoveit2 into
-`src/vendor`. `ur7e_gazebo` needs Gazebo, which the robot computer does not;
-two workers leave the box usable for others while it builds.
+`vendor_import.sh` fetches the UR + RG2 drivers into `src/vendor`; two
+workers leave the box usable for others while it builds. 12 packages: 7 of
+ours under `src/`, 5 vendored. (The old pick-and-place repo built 15; its
+`ur7e_motion`, `ur7e_safety_monitor`, `ur7e_gazebo` and pymoveit2 are not on
+the chess path and are not here.)
 
 ### 6. The demo's calibration
 

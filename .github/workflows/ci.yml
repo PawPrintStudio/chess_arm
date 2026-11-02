@@ -1,7 +1,7 @@
-# CI (task 0.7): every push/PR must build, pass lint, and pass the sim tier-1
-# smoke test. This is the same sequence a member runs locally in the
-# devcontainer, executed inside the plain `ros:humble` image so CI stays
-# lean (~no GUI stack) and honest (no devcontainer-only magic).
+# CI: every push/PR must build, pass lint, pass the mock-hardware smoke test
+# and the chess unit tests. Same sequence a member runs in the devcontainer,
+# executed inside the plain `ros:humble` image so CI stays lean (no GUI
+# stack) and honest (no devcontainer-only magic).
 name: CI
 
 on:
@@ -17,15 +17,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Vendor import (ur7e.repos)
-        # Phase 1's UR+RG2 packages (D6) aren't vendored in-tree — pulled at
-        # build time same as any other dependency, see ur7e.repos and
+        # The UR+RG2 packages aren't vendored in-tree — pulled at build time
+        # same as any other dependency, see ur7e.repos and
         # scripts/vendor_import.sh. libnet1-dev is the one apt dep those
         # vendored packages need that isn't resolvable from their own
         # package.xml (see the script's comment).
         run: |
           apt-get update
-          apt-get install -y python3-vcstool git libnet1-dev
+          apt-get install -y python3-vcstool git libnet1-dev stockfish python3-pip
           bash scripts/vendor_import.sh
+          pip3 install "pytest>=7,<9" "chess>=1.10"
 
       - name: Install dependencies (rosdep)
         # rosdep reads our package.xml files and apt-installs whatever they
@@ -51,19 +52,12 @@ jobs:
           source /opt/ros/humble/setup.bash
           colcon test --packages-skip \
             onrobot_description onrobot_driver ur_onrobot_description \
-            ur_onrobot_control ur_onrobot_moveit_config pymoveit2
+            ur_onrobot_control ur_onrobot_moveit_config
           colcon test-result --verbose
 
       - name: Guard against silent test-collection loss
         # `colcon test` exits 0 when a package collects NO tests, so a broken
         # test file can silently disable a whole suite while CI stays green.
-        #
-        # Case study (2026-09-22): a single `pytest.importorskip` at module
-        # level in arm_language/test/test_claude_backend.py aborted the entire
-        # collection session on Humble's pytest 6.2.5. The package went from 98
-        # collected tests to "1 skipped" and `colcon test` still passed. The
-        # fix was a `pytestmark` skipif; this step is so the next one is caught
-        # by a machine instead of by someone re-reading a log.
         shell: bash
         run: |
           python3 - <<'PY'
@@ -85,32 +79,18 @@ jobs:
           sys.exit(1 if failed else 0)
           PY
 
-      - name: Sim tier-1 smoke test
+      - name: Mock-hardware smoke test
         shell: bash
         run: bash scripts/tier1_smoke_test.sh
 
-      - name: URCap handoff protocol and ROS contract (no hardware)
+      - name: Chess tests (no hardware)
+        # The same command docs/JETSON.md step 7 runs on the robot computer.
         shell: bash
         run: |
           source /opt/ros/humble/setup.bash
           source install/setup.bash
-          python3 -m unittest discover -s scripts -p test_urcap_handoff_protocol.py
-          python3 -m unittest discover -s scripts -p test_pick_sequence.py
-          ROS_DOMAIN_ID=86 ROS_LOCALHOST_ONLY=1 python3 -m unittest discover -s scripts -p test_urcap_handoff_ros.py
-
-      - name: Intent-parser corpus (offline backend)
-        # `colcon test` already gates this via test_corpus.py; running the
-        # eval again here is for the human-readable table in the CI log — when
-        # a parse regresses, the per-utterance rows say which one and why
-        # without anyone re-running it locally.
-        #
-        # The offline backend is used on purpose: CI must not need an API key,
-        # and this step gates the SAFETY CONTRACT (exit 1 on any violation),
-        # not language accuracy. Accuracy against the real Claude backend is
-        # task 3.1's acceptance bar and is run by hand — see
-        # src/arm_language/README.md.
-        shell: bash
-        run: |
-          source /opt/ros/humble/setup.bash
-          source install/setup.bash
-          python3 -m arm_language.eval --backend keyword
+          cd scripts
+          PYTHONPATH=$PYTHONPATH:../src/ur7e_perception python3 -m pytest -q \
+            -p no:launch_testing -p no:launch_ros \
+            test_lab_chess.py test_chess_operator.py test_chess_vision.py \
+            test_chess_gestures.py test_chess_voice.py test_lab_tooling.py

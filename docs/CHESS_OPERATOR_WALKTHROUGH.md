@@ -75,7 +75,7 @@ foreground demo process has already ended. A fresh run does not require tmux.
 In a normal laptop terminal, run:
 
 ```bash
-cd /home/nikola/Projects/Makerspace/AI_arm
+cd /home/nikola/Projects/Makerspace/chess_arm
 export UR_LINK=ur-link-chess ROBOT_IP=192.168.1.10 LAPTOP_IP=192.168.1.2
 nmcli con up "$UR_LINK"
 lsusb
@@ -103,7 +103,7 @@ The old VS Code container previously failed to start because of a stale
 `/run/user/1000/wayland-0` mount. If that exact error recurs, do not rebuild
 blindly during demo setup. Start the prepared fallback using the appendix,
 then use **Dev Containers: Attach to Running Container…**, select
-`ur7e-chess-showcase`, and open `/workspaces/AI_arm`. All subsequent work can
+`ur7e-chess-showcase`, and open `/workspaces/chess_arm`. All subsequent work can
 still use VS Code terminals. Do not launch a second stack in another container.
 
 ## 2. Open and prepare three container terminals
@@ -116,7 +116,7 @@ already inside the container: do not run `docker exec` in them. Use Bash
 Run this in **each** integrated terminal:
 
 ```bash
-source /workspaces/AI_arm/scripts/chess_env.sh
+source /workspaces/chess_arm/scripts/chess_env.sh
 ```
 
 This script enters the project, removes an inherited host virtualenv, loads
@@ -127,7 +127,7 @@ It does not start a driver, camera, calibration or motion.
 Label the windows T1, T2 and T3 so you can find them during a demonstration.
 
 **Where each thing runs.** The prompt tells you which side you are on:
-`ros@nikola-LOQ:/workspaces/AI_arm$` is the container, `~/Pr/Makerspace/AI_arm`
+`ros@nikola-LOQ:/workspaces/chess_arm$` is the container, `~/Pr/Makerspace/chess_arm`
 is the laptop itself. The container reads the repo folder live, so a `git
 pull` needs no rebuild, but a **running** `watch`, `play` or voice keeps its
 old code until restarted.
@@ -138,7 +138,7 @@ old code until restarted.
 | Laptop (T4) | `.venv-voice/bin/python scripts/chess_voice.py` (sound card, GPU), the two browser windows |
 
 A container terminal from any laptop terminal: `docker exec -it <container> bash`
-(`docker ps` names it), then `cd /workspaces/AI_arm`.
+(`docker ps` names it), then `cd /workspaces/chess_arm`.
 
 ## 3. Day-of setup — reuse the accepted calibration
 
@@ -440,7 +440,7 @@ docker start ur7e-chess-showcase
 ```
 
 Then in VS Code choose **Dev Containers: Attach to Running Container…** →
-`ur7e-chess-showcase`, open `/workspaces/AI_arm`, and follow section 2.
+`ur7e-chess-showcase`, open `/workspaces/chess_arm`, and follow section 2.
 This fallback uses the same cached image and checkout, avoiding the old
 container's stale Wayland mount. If the named container does not exist,
 resolve that preparation issue rather than substituting an arbitrary image.
@@ -448,7 +448,7 @@ resolve that preparation issue rather than substituting an arbitrary image.
 For a shell-only fallback instead of VS Code, run this from each HOST terminal:
 
 ```bash
-docker exec -it -w /workspaces/AI_arm \
+docker exec -it -w /workspaces/chess_arm \
   -e ROBOT_IP=192.168.1.10 -e LAPTOP_IP=192.168.1.2 \
   ur7e-chess-showcase bash
 ```

@@ -28,7 +28,7 @@ using these values; they must match the robot you are physically using.
 On the **laptop host**, in a terminal:
 
 ```bash
-cd ~/Projects/Makerspace/AI_arm
+cd ~/Projects/Makerspace/chess_arm
 export UR_LINK=ur-link-chess ROBOT_IP=192.168.1.10 LAPTOP_IP=192.168.1.2
 nmcli con up "$UR_LINK"
 docker start ur7e-chess-showcase
@@ -49,7 +49,7 @@ docker exec -it ur7e-chess-showcase bash
 Then in each container terminal:
 
 ```bash
-cd /workspaces/AI_arm
+cd /workspaces/chess_arm
 if [ -n "${VIRTUAL_ENV:-}" ]; then deactivate; fi
 source /opt/ros/humble/setup.bash
 source install/setup.bash

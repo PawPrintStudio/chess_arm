@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Source once in each Bash dev-container terminal; this starts no processes.
 if [[ -z "${BASH_VERSION:-}" ]]; then
-  printf '%s\n' 'Use a Bash terminal, then: source /workspaces/AI_arm/scripts/chess_env.sh' >&2
+  printf '%s\n' 'Use a Bash terminal, then: source /workspaces/chess_arm/scripts/chess_env.sh' >&2
   return 1
 fi
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   printf '%s\n' 'Use source, not bash, so settings stay in your terminal:' \
-    '  source /workspaces/AI_arm/scripts/chess_env.sh' >&2
+    '  source /workspaces/chess_arm/scripts/chess_env.sh' >&2
   exit 1
 fi
 

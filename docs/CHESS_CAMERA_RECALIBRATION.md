@@ -74,7 +74,7 @@ board really is in the starting position.
 Inspect the image in the laptop file manager, or run on **HOST**:
 
 ```bash
-xdg-open /home/nikola/Projects/Makerspace/AI_arm/log/chess/overlay.jpg
+xdg-open /home/nikola/Projects/Makerspace/chess_arm/log/chess/overlay.jpg
 ```
 
 Check all four corners and grid lines across the whole board. The label

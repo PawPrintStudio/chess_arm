@@ -23,19 +23,15 @@ bags/
 .env
 *.key
 
-# URSim: fetched by sim/ursim/get_urcap.sh, not committed
-sim/ursim/urcaps/*.urcap
-
 # Vendored third-party ROS packages: fetched by scripts/vendor_import.sh
 # (ur7e.repos), not committed — same treatment as apt-installed deps.
 src/vendor/
 
-# lab_console.py taught poses are per-session, per-robot state, not source
+# taught poses (chess_home, observe) are per-session, per-robot state, not source
 scripts/.console_poses.json
 
-# host-side voice client environment (scripts/voice_input.py)
+# host-side voice environment (scripts/chess_voice.py: Ollama + Piper)
 .venv-voice/
-scripts/.voice_inbox.txt
 
 # lab calibration session files (per camera position / per day); the
 # calibrations that produced recorded results live under docs/evidence/
